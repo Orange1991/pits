@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+    <meta charset="utf-8"/>
+    <title>Pits</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <script type="text/javascript" src=""></script>
+  </head>
+  <body onload="init()">
+    <div id="main-container">
+      <div id="sky-container">
+      </div>
+      <div id="earth-container">
+        <div id="start-pit" class="pit"></div>
+        <div id="pit-one" class="pit"></div>
+        <div id="pit-two" class="pit"></div>
+      </div>
+      <div id="nav-container">
+        <div class="nav-block" id="nav-intro">
+          <div class="nav-en">HOW TO PLAY</div>
+          <div class="nav-zh">玩法介绍</div>
+        </div>
+        <div class="nav-block">
+          <div class="nav-en">START</div>
+          <div class="nav-zh">开始</div>
+        </div>
+        <div class="nav-block" id="nav-about">
+          <div class="nav-en">ABOUT</div>
+          <div class="nav-zh">关于</div>
+        </div>
+      </div>
+      <div id="intro-container" class="hover-container">
+        <button class="close-button" id="close-intro">&times;</button>
+        <div class="intro-scroll">
+          <div class="intro-pics-container">
+            <div class="intro-inner">
+              <span><img src="img/intro-1.jpg"/></span>
+              <span><img src="img/intro-1.jpg"/></span>
+              <span><img src="img/intro-1.jpg"/></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="about-container" class="hover-container">
+        <button class="close-button" id="close-about">&times;</button>
+        <div id="about">
+          <p>Pits is a webpage game for relaxing. Help our little friends to walk through the pits and get delicious food. Enjoy it!</p>
+          <p>这是一款轻松的网页游戏。帮助小伙伴们越过坑以得到美味的食物。玩得开心！</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+  var init = function () {
+    var width = document.body.clientWidth;
+    var height = document.body.clientHeight;
+    document.body.className = width >= height ? 'horizontal' : 'vertical';
+    var openAbout = function () { document.querySelector('#about-container').className += ' show'; };
+    var closeAbout = function () { document.querySelector('#about-container').className = 'hover-container'; };
+    var openIntro = function () { document.querySelector('#intro-container').className += ' show'; };
+    var closeIntro = function () { document.querySelector('#intro-container').className = 'hover-container'; };
+    if (addEventListener) {
+      document.querySelector('#nav-about').addEventListener('click', openAbout);
+      document.querySelector('#close-about').addEventListener('click', closeAbout);
+      document.querySelector('#nav-intro').addEventListener('click', openIntro);
+      document.querySelector('#close-intro').addEventListener('click', closeIntro);
+    } else if (bind) {
+      document.querySelector('#nav-about').bind('click', openAbout);
+      document.querySelector('#close-about').bind('click', closeAbout);
+      document.querySelector('#nav-intro').bind('click', openIntro);
+      document.querySelector('#close-intro').bind('click', closeIntro);
+    }
+  };
+  </script>
+</html>
