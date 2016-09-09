@@ -219,3 +219,19 @@ html, body {
 .intro-pics-container .intro-inner span {
   display: block;
 }
+#logo {
+  position: absolute;
+  width: 100%;
+  top: 30%;
+  text-align: center;
+}
+#player {
+  position: absolute;
+  top: -45px;
+  left: 20%;
+}
+#award {
+  position: absolute;
+  top: -35px;
+  right: 20%;
+}

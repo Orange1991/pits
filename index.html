@@ -10,18 +10,24 @@
   <body onload="init()">
     <div id="main-container">
       <div id="sky-container">
+        <div id="logo">
+          <img src="img/pits.png" />
+          <p id="prompt" style="margin-top: 20px"></p>
+        </div>
       </div>
       <div id="earth-container">
         <div id="start-pit" class="pit"></div>
         <div id="pit-one" class="pit"></div>
         <div id="pit-two" class="pit"></div>
+        <div id="player"><img src="img/dog.png" /></div>
+        <div id="award"><img src="img/bone.png" /></div>
       </div>
       <div id="nav-container">
         <div class="nav-block" id="nav-intro">
           <div class="nav-en">HOW TO PLAY</div>
           <div class="nav-zh">玩法介绍</div>
         </div>
-        <div class="nav-block">
+        <div class="nav-block" id="nav-start">
           <div class="nav-en">START</div>
           <div class="nav-zh">开始</div>
         </div>
@@ -35,9 +41,9 @@
         <div class="intro-scroll">
           <div class="intro-pics-container">
             <div class="intro-inner">
-              <span><img src="img/intro-1.jpg"/></span>
-              <span><img src="img/intro-1.jpg"/></span>
-              <span><img src="img/intro-1.jpg"/></span>
+              <span><img src="img/intro-1.png"/></span>
+              <span><img src="img/intro-2.png"/></span>
+              <span><img src="img/intro-3.png"/></span>
             </div>
           </div>
         </div>
@@ -62,16 +68,19 @@
     var closeAbout = function () { document.querySelector('#about-container').className = 'hover-container'; };
     var openIntro = function () { document.querySelector('#intro-container').className += ' show'; };
     var closeIntro = function () { document.querySelector('#intro-container').className = 'hover-container'; };
+    var startGame = function () { document.querySelector('#prompt').innerHTML = 'Coming soon...'; };
     if (addEventListener) {
       document.querySelector('#nav-about').addEventListener('click', openAbout);
       document.querySelector('#close-about').addEventListener('click', closeAbout);
       document.querySelector('#nav-intro').addEventListener('click', openIntro);
       document.querySelector('#close-intro').addEventListener('click', closeIntro);
+      document.querySelector('#nav-start').addEventListener('click', startGame);
     } else if (bind) {
       document.querySelector('#nav-about').bind('click', openAbout);
       document.querySelector('#close-about').bind('click', closeAbout);
       document.querySelector('#nav-intro').bind('click', openIntro);
       document.querySelector('#close-intro').bind('click', closeIntro);
+      document.querySelector('#nav-start').bind('click', startGame);
     }
   };
   </script>
