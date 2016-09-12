@@ -78,16 +78,22 @@ html, body {
   position: absolute;
   top: -2px;
 }
-#start-pit {
+#pit-one {
   width: 20%;
   height: 20%;
   left: 40%;
+  transition: all .2s ease-out;
+}
+.filling {
+  background-color: #300;
+  position: absolute;
 }
 #nav-container {
   position: absolute;
   left: 5%;
   top: 70%;
   width: 90%;
+  transition: opacity .2s ease-out;
 }
 #nav-container .nav-block {
   width: 30%;
@@ -101,6 +107,9 @@ html, body {
 #nav-container .nav-block:hover {
   font-size: 110%;
   color: #ff0;
+}
+#nav-container.hide {
+  opacity: 0;
 }
 #nav-container:after {
   content: '';
@@ -232,6 +241,10 @@ html, body {
   width: 100%;
   top: 30%;
   text-align: center;
+  transition: opacity .2s ease-out;
+}
+#logo.hide {
+  opacity: 0;
 }
 #player {
   position: absolute;

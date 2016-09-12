@@ -12,11 +12,11 @@
       <div id="sky-container">
         <div id="logo">
           <img src="img/pits.png" />
-          <p id="prompt" style="margin-top: 20px"></p>
         </div>
+        <div id="filling-one" class="filling"></div>
+        <div id="filling-two" class="filling"></div>
       </div>
       <div id="earth-container">
-        <div id="start-pit" class="pit"></div>
         <div id="pit-one" class="pit"></div>
         <div id="pit-two" class="pit"></div>
         <div id="player"><img src="img/dog.png" /></div>
@@ -63,12 +63,29 @@
   var init = function () {
     var width = document.body.clientWidth;
     var height = document.body.clientHeight;
+    var edgeLength = width < height ? width : height;
+    var maxPitEdge = edgeLength / 5;
+    var minPitEdge = maxPitEdge * 0.2;
+    (minPitEdge > 20) && (minPitEdge = 20);
+    var fillingStartEdge = minPitEdge;
+    var fillingMaxEdge = edgeLength;
+    var pitOne = document.querySelector('#pit-one');
+    var pitTwo = document.querySelector('#pit-two');
     document.body.className = width >= height ? 'horizontal' : 'vertical';
     var openAbout = function () { document.querySelector('#about-container').className += ' show'; };
     var closeAbout = function () { document.querySelector('#about-container').className = 'hover-container'; };
     var openIntro = function () { document.querySelector('#intro-container').className += ' show'; };
     var closeIntro = function () { document.querySelector('#intro-container').className = 'hover-container'; };
-    var startGame = function () { document.querySelector('#prompt').innerHTML = 'Coming soon...'; };
+    var init = function () {
+      document.querySelector('#logo').className = 'hide';
+      document.querySelector('#nav-container').className = 'hide';
+      pitOne.style.width = maxPitEdge + 'px';
+      pitOne.style.height = maxPitEdge + 'px';
+      pitOne.style.left = (width - maxPitEdge) / 2 + 'px';
+    };
+    var startGame = function () {
+      init();
+    };
     if (addEventListener) {
       document.querySelector('#nav-about').addEventListener('click', openAbout);
       document.querySelector('#close-about').addEventListener('click', closeAbout);
