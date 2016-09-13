@@ -91,9 +91,6 @@ html, body {
   position: absolute;
   z-index: 3;
 }
-#filling-one.hide {
-  opacity: 0;
-}
 #nav-container {
   position: absolute;
   left: 5%;
@@ -116,9 +113,6 @@ html, body {
 }
 #nav-container.transparent {
   opacity: 0;
-}
-#nav-container.hide {
-  display: none;  
 }
 #nav-container:after {
   content: '';
@@ -252,7 +246,7 @@ html, body {
   text-align: center;
   transition: opacity .2s ease-out;
 }
-#logo.hide {
+.hide {
   display: none;
 }
 #logo.transparent {
@@ -267,4 +261,20 @@ html, body {
   position: absolute;
   top: -35px;
   right: 20%;
+}
+#score-container {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+#score {
+  font-size: 20px;
+  font-weight: bold;
+  height: 37px;
+  line-height: 37px;
+  float: right;
+  margin-left: 10px;
+}
+#score.emphasized {
+  font-size: 130%;
 }

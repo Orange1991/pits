@@ -13,14 +13,18 @@
         <div id="logo">
           <img src="img/pits.png" />
         </div>
+        <div id="score-container" class="hide smooth transparent">
+          <img id="score-img" src="img/bone.png">
+          <span id="score" class="smooth">0</span>
+        </div>
         <div id="filling-one" class="filling hide smooth"></div>
         <div id="filling-two" class="filling"></div>
       </div>
       <div id="earth-container">
         <div id="pit-one" class="pit smooth"></div>
         <div id="pit-two" class="pit"></div>
-        <div id="player"><img src="img/dog.png" /></div>
-        <div id="award"><img src="img/bone.png" /></div>
+        <div id="player" class="smooth"><img src="img/dog.png" /></div>
+        <div id="award" class="smooth"><img src="img/bone.png" /></div>
       </div>
       <div id="nav-container">
         <div class="nav-block" id="nav-intro">
@@ -60,8 +64,19 @@
     </div>
   </body>
   <script type="text/javascript">
+  var eventsMap = {
+    'mousedown': 'touchstart',
+    'mouseup': 'touchend'
+  };
   var listen = function (obj, e, trigger) {
-    addEventListener && obj.addEventListener(e, trigger);
+    if (obj) {
+      if (obj.addEventListener) {
+        obj.addEventListener(e, trigger);
+        if (eventsMap[e]) {
+          obj.addEventListener(eventsMap[e], trigger);
+        }
+      }
+    }
   };
   var addClass = function (obj, c) {
     if (!obj || !c) {
@@ -106,49 +121,90 @@
     obj.style.height = edge + 'px';
     obj.style.left = (screenWidth - edge) / 2 + 'px';
   };
+  var renderRect = function (obj, edge) {
+    if (!obj) {
+      return;
+    }
+    obj.style.width = edge + 'px';
+    obj.style.height = edge + 'px';
+  };
+  var renderLeft = function (obj, left) {
+    obj && (obj.style.left = left + 'px');
+  };
+  var renderRight = function (obj, right) {
+    obj && (obj.style.right = right + 'px');
+  };
+  var renderTop = function (obj, top) {
+    obj && (obj.style.top = top + 'px');
+  };
   var init = function () {
     var screenWidth = document.body.clientWidth;
     var screenHeight = document.body.clientHeight;
     var edgeLength = screenWidth < screenHeight ? screenWidth : screenHeight;
     var maxPitEdge = edgeLength / 5;
     var minPitEdge = maxPitEdge * 0.2;
-    var currentPitEde = maxPitEdge;
+    var currentPitEdge = maxPitEdge;
     (minPitEdge > 20) && (minPitEdge = 20);
-    var fillingMinEdge = minPitEdge / 2;
-    var fillingMaxEdge = maxPitEdge * 2;
-    var currentFillingEdge = fillingMinEdge;
+    var minFillingEdge = minPitEdge / 2;
+    var maxFillingEdge = maxPitEdge * 2;
+    var currentFillingEdge = minFillingEdge;
     var mainContainer = document.querySelector('#main-container');
     var pitOne = document.querySelector('#pit-one');
     var pitTwo = document.querySelector('#pit-two');
     var fillingOne = document.querySelector('#filling-one');
     var fillingTwo = document.querySelector('#filling-two');
+    var player = document.querySelector('#player');
+    var award = document.querySelector('#award');
+    var score = document.querySelector('#score');
+    var scoreContainer = document.querySelector('#score-container');
     var currentPit = pitOne;
     var currentFilling = fillingOne;
     var nextPit = pitTwo;
     var nextFilling = fillingTwo;
     var canEnlarge = false;
+    var scoreCount = 0;
     document.body.className = screenWidth >= screenHeight ? 'horizontal' : 'vertical';
     var enlargeInterval;
+    var ANIM_DURATION = 200;
+    var WALK_THROUGH_RESULT= {
+      THROUGH: 0,
+      TOO_WIDE: 1,
+      TOO_HIGH: 2,
+      BLOCK: 3
+    };
+    var WALK_THROUGH_MAX_WIDTH = maxPitEdge / 4;
+    var WALK_THROUGH_MAX_HEIGHT = maxPitEdge / 3;
+    var HIDE_CLASS = 'hide';
+    var TRANSPARENT_CLASS = 'transparent';
+    var SMOOTH_CLASS = 'smooth';
+    var EMPHASIZED_CLASS = 'emphasized';
 
     var openAbout = function () { addClass(document.querySelector('#about-container'), 'show'); };
     var closeAbout = function () { removeClass(document.querySelector('#about-container'), 'show'); };
     var openIntro = function () { addClass(document.querySelector('#intro-container'), 'show'); };
     var closeIntro = function () { removeClass(document.querySelector('#intro-container'), 'show'); };
+    var startGame = function () {
+      initGame();
+    };
     var initGame = function () {
-      addClass(document.querySelector('#logo'), 'transparent');
-      addClass(document.querySelector('#nav-container'), 'transparent');
+      canEnlarge = false;
+      scoreCount = 0;
+      addClass(document.querySelector('#logo'), TRANSPARENT_CLASS);
+      addClass(document.querySelector('#nav-container'), TRANSPARENT_CLASS);
       setTimeout(function () {
-        addClass(document.querySelector('#logo'), 'hide');
-        addClass(document.querySelector('#nav-container'), 'hide');
-      }, 200);
-      renderCenterRect(pitOne, currentPitEde, screenWidth);
-      removeClass(fillingOne, 'hide');
-      fillingOne.style.top = '20px';
+        addClass(document.querySelector('#logo'), HIDE_CLASS);
+        addClass(document.querySelector('#nav-container'), HIDE_CLASS);
+      }, ANIM_DURATION);
+      renderCenterRect(pitOne, currentPitEdge, screenWidth);
+      removeClass(scoreContainer, HIDE_CLASS);
+      removeClass(scoreContainer, TRANSPARENT_CLASS);
+      removeClass(fillingOne, HIDE_CLASS);
+      renderTop(fillingOne, 20);
       renderCenterRect(fillingOne, currentFillingEdge, screenWidth);
       setTimeout(function () {
-        removeClass(fillingOne, 'smooth');
+        removeClass(fillingOne, SMOOTH_CLASS);
         canEnlarge = true;
-      }, 200);
+      }, ANIM_DURATION);
       listen(mainContainer, 'mousedown', startEnlargement);
       listen(mainContainer, 'mouseup', stopEnlargementAndStartFallDown);
     };
@@ -157,28 +213,156 @@
         enlargeInterval && clearInterval(enlargeInterval);
         canEnlarge = false;
         enlargeInterval = setInterval(function () {
-          currentFillingEdge < fillingMaxEdge && (currentFillingEdge += 1);
+          currentFillingEdge < maxFillingEdge && (currentFillingEdge += 1);
           renderCenterRect(currentFilling, currentFillingEdge, screenWidth);
         }, 10);
       }
     };
-    var stopEnlargementAndStartFallDown = function () {
+    var stopEnlargementAndStartFallDown = function (e) {
       enlargeInterval && clearInterval(enlargeInterval);
       enlargeInterval = null;
-      addClass(currentFilling, 'smooth');
+      addClass(currentFilling, SMOOTH_CLASS);
       var fillingTop = screenHeight * 0.5 - currentFillingEdge;
-      if (currentFillingEdge <= currentPitEde) {
-        fillingTop += currentPitEde;
+      var canFill = canFillIn(currentFillingEdge, currentPitEdge);
+      if (canFill) {
+        fillingTop += currentPitEdge;
       }
-      currentFilling.style.top = fillingTop + 'px';
+      renderTop(currentFilling, fillingTop);
       setTimeout(function () {
-        removeClass(currentFilling, 'smooth');
-        // tryMoveForward();
-      }, 300);
+        removeClass(currentFilling, SMOOTH_CLASS);
+        moveForward(canFill);
+      }, ANIM_DURATION);
+      e.preventDefault();
     };
-    var startGame = function () {
-      initGame();
+    var moveForward = function (canFillIn) {
+      if (canFillIn) {
+        switch (walkThroughResult(currentFillingEdge, currentPitEdge)) {
+          case WALK_THROUGH_RESULT.THROUGH:
+            renderLeft(player, screenWidth * 0.75 - player.clientWidth / 2);
+            setTimeout(function () {
+              addClass(award, SMOOTH_CLASS);
+              renderRight(award, 20 + score.clientWidth);
+              renderTop(award, 20 - screenHeight / 2);
+              setTimeout(function () {
+                removeClass(award, SMOOTH_CLASS);
+                addClass(award, HIDE_CLASS);
+                addClass(score, EMPHASIZED_CLASS);
+                score.innerHTML = ++scoreCount;
+                setTimeout(function () {
+                  removeClass(score, EMPHASIZED_CLASS);
+                }, ANIM_DURATION);
+                mapForward();
+              }, ANIM_DURATION);
+            }, ANIM_DURATION);
+            break;
+          case WALK_THROUGH_RESULT.TOO_WIDE:
+            renderLeft(player, (screenWidth - currentPitEdge) / 2);
+            setTimeout(function () {
+              renderTop(player, currentPitEdge - player.clientHeight);
+              setTimeout(function () { showScore(WALK_THROUGH_RESULT.TOO_WIDE); }, ANIM_DURATION);
+            }, ANIM_DURATION);
+            break;
+          case WALK_THROUGH_RESULT.TOO_HIGH:
+            renderLeft(player, (screenWidth - currentPitEdge) / 2);
+            setTimeout(function () {
+              renderTop(player, currentPitEdge - currentFillingEdge - player.clientHeight);
+              setTimeout(function () { showScore(WALK_THROUGH_RESULT.TOO_HIGH); }, ANIM_DURATION);
+            }, ANIM_DURATION);
+            break;
+        }
+      } else {
+        renderLeft(player, (screenWidth - currentFillingEdge) / 2 - player.clientWidth);
+        setTimeout(function () {
+          showScore(WALK_THROUGH_RESULT.BLOCK);
+        }, ANIM_DURATION);
+      }
     };
+    var mapForward = function () {
+      initOverflowElements();
+      moveCurrentElements();
+      moveOverflowElements();
+      exchangeElementsRole();
+      enableEnlargement();
+    };
+    var initOverflowElements = function () {
+      removeClass(nextFilling, SMOOTH_CLASS);
+      removeClass(nextPit, SMOOTH_CLASS);
+      removeClass(award, SMOOTH_CLASS);
+      removeClass(award, HIDE_CLASS);
+      currentFillingEdge = minFillingEdge;
+      currentPitEdge = calRandomPitEdge(minPitEdge, maxPitEdge);
+      renderRect(nextFilling, currentFillingEdge);
+      renderRect(nextPit, currentPitEdge);
+      renderTop(nextFilling, 20);
+      renderLeft(nextFilling,  screenWidth + currentFillingEdge);
+      renderLeft(nextPit, screenWidth + currentPitEdge);
+      renderRight(award, -(screenWidth / 2));
+      renderTop(award, -award.clientHeight);
+    };
+    var moveCurrentElements = function () {
+      renderLeft(currentPit, -currentPit.clientWidth);
+      renderLeft(currentFilling, -currentFilling.clientWidth);
+      renderLeft(player, screenWidth * 0.2);
+    };
+    var moveOverflowElements = function () {
+      addClass(nextFilling, SMOOTH_CLASS);
+      addClass(nextPit, SMOOTH_CLASS);
+      addClass(award, SMOOTH_CLASS);
+      renderLeft(nextFilling, (screenWidth - currentFillingEdge) / 2);
+      renderLeft(nextPit, (screenWidth - currentPitEdge) / 2);
+      renderRight(award, screenWidth * 0.2);
+      setTimeout(function () {
+        removeClass(currentFilling  , SMOOTH_CLASS);
+        removeClass(nextFilling, SMOOTH_CLASS);
+      }, ANIM_DURATION);
+    };
+    var exchangeElementsRole = function () {
+      var tmp = nextFilling;
+      nextFilling = currentFilling;
+      currentFilling = tmp;
+      tmp = nextPit;
+      nextPit = currentPit;
+      currentPit = tmp;
+    };
+    var enableEnlargement = function () {
+      setTimeout(function () {
+        canEnlarge = true;
+      }, ANIM_DURATION * 2);
+    };
+    var canFillIn = function (fillEdge, pitEdge) {
+      return fillEdge <= pitEdge;
+    };
+    var walkThroughResult = function (fillEdge, pitEdge) {
+      var gapHeight = pitEdge - fillEdge;
+      var gapWidth = gapHeight / 2;
+      if (gapWidth > WALK_THROUGH_MAX_WIDTH) {
+        return WALK_THROUGH_RESULT.TOO_WIDE;
+      }
+      if (gapHeight > WALK_THROUGH_MAX_HEIGHT) {
+        return WALK_THROUGH_RESULT.TOO_HIGH;
+      }
+      return WALK_THROUGH_RESULT.THROUGH;
+    };
+    var calRandomPitEdge = function (minVal, maxVal) {
+      var edge = parseInt(minVal + (maxVal - minVal) * Math.random());
+      return edge > maxVal ? maxVal : edge < minVal ? minVal : edge;
+    };
+    var showScore = function (type) {
+      switch (type) {
+        case WALK_THROUGH_RESULT.TOO_HIGH:
+          alert('摔死啦，得分：' + scoreCount + '，刷新界面重新开始');
+          break;
+        case WALK_THROUGH_RESULT.TOO_WIDE:
+          alert('太远了，过不去，得分；' + scoreCount + '，刷新界面重新开始');
+          break;
+        case WALK_THROUGH_RESULT.BLOCK:
+          alert('撞墙啦，得分：' + scoreCount + '，刷新界面重新开始');
+          break;
+        default:
+          alert('得分：' + scoreCount + '，刷新界面重新开始');
+          break;
+      }
+  };
     listen(document.querySelector('#nav-about'), 'click', openAbout);
     listen(document.querySelector('#close-about'), 'click', closeAbout);
     listen(document.querySelector('#nav-intro'), 'click', openIntro);
