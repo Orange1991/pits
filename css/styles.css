@@ -77,16 +77,20 @@ html, body {
   background-color: #09f;
   position: absolute;
   top: -2px;
+  transition: all .2s ease-in-out;
 }
 #pit-one {
   width: 20%;
   height: 20%;
   left: 40%;
-  transition: all .2s ease-out;
 }
 .filling {
   background-color: #300;
   position: absolute;
+  transition: all .2s ease-in-out;
+}
+#filling-one.hide {
+  opacity: 0;
 }
 #nav-container {
   position: absolute;

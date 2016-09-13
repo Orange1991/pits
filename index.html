@@ -13,7 +13,7 @@
         <div id="logo">
           <img src="img/pits.png" />
         </div>
-        <div id="filling-one" class="filling"></div>
+        <div id="filling-one" class="filling hide"></div>
         <div id="filling-two" class="filling"></div>
       </div>
       <div id="earth-container">
@@ -60,45 +60,71 @@
     </div>
   </body>
   <script type="text/javascript">
+  var listen = function (obj, e, trigger) {
+    addEventListener && obj.addEventListener(e, trigger);
+  };
   var init = function () {
-    var width = document.body.clientWidth;
-    var height = document.body.clientHeight;
-    var edgeLength = width < height ? width : height;
+    var screenWidth = document.body.clientWidth;
+    var screenHeight = document.body.clientHeight;
+    var edgeLength = screenWidth < screenHeight ? screenWidth : screenHeight;
     var maxPitEdge = edgeLength / 5;
     var minPitEdge = maxPitEdge * 0.2;
     (minPitEdge > 20) && (minPitEdge = 20);
-    var fillingStartEdge = minPitEdge;
-    var fillingMaxEdge = edgeLength;
+    var fillingMinEdge = minPitEdge / 2;
+    var fillingMaxEdge = maxPitEdge * 2;
+    var currentFillingEdge = fillingMinEdge;
+    var mainContainer = document.querySelector('#main-container');
     var pitOne = document.querySelector('#pit-one');
     var pitTwo = document.querySelector('#pit-two');
-    document.body.className = width >= height ? 'horizontal' : 'vertical';
+    var fillingOne = document.querySelector('#filling-one');
+    var fillingTwo = document.querySelector('#filling-two');
+    var currentPit = pitOne;
+    var currentFilling = fillingOne;
+    var nextPit = pitTwo;
+    var nextFilling = fillingTwo;
+    document.body.className = screenWidth >= screenHeight ? 'horizontal' : 'vertical';
+    var enlargeInterval;
+
     var openAbout = function () { document.querySelector('#about-container').className += ' show'; };
     var closeAbout = function () { document.querySelector('#about-container').className = 'hover-container'; };
     var openIntro = function () { document.querySelector('#intro-container').className += ' show'; };
     var closeIntro = function () { document.querySelector('#intro-container').className = 'hover-container'; };
-    var init = function () {
+    var initGame = function () {
       document.querySelector('#logo').className = 'hide';
       document.querySelector('#nav-container').className = 'hide';
       pitOne.style.width = maxPitEdge + 'px';
       pitOne.style.height = maxPitEdge + 'px';
-      pitOne.style.left = (width - maxPitEdge) / 2 + 'px';
+      pitOne.style.left = (screenWidth - maxPitEdge) / 2 + 'px';
+      fillingOne.className = 'filling';
+      fillingOne.style.width = currentFillingEdge + 'px';
+      fillingOne.style.height = currentFillingEdge + 'px';
+      fillingOne.style.left = (screenWidth - currentFillingEdge) / 2 + 'px';
+      fillingOne.style.top = '20px';
+      listen(mainContainer, 'mousedown', startEnlargement);
+      listen(mainContainer, 'mouseup', stopEnlargementAndFallDown);
+    };
+    var startEnlargement = function () {
+      enlargeInterval && clearInterval(enlargeInterval);
+      enlargeInterval = setInterval(function () {
+        console.log(fillingMaxEdge)
+        currentFillingEdge < fillingMaxEdge && (currentFillingEdge += 1);
+        currentFilling.style.width = currentFillingEdge + 'px';
+        currentFilling.style.height = currentFillingEdge + 'px';
+        currentFilling.style.left = (screenWidth - currentFillingEdge) / 2 + 'px';
+      }, 10);
+    };
+    var stopEnlargementAndFallDown = function () {
+      enlargeInterval && clearInterval(enlargeInterval);
+      enlargeInterval = null;
     };
     var startGame = function () {
-      init();
+      initGame();
     };
-    if (addEventListener) {
-      document.querySelector('#nav-about').addEventListener('click', openAbout);
-      document.querySelector('#close-about').addEventListener('click', closeAbout);
-      document.querySelector('#nav-intro').addEventListener('click', openIntro);
-      document.querySelector('#close-intro').addEventListener('click', closeIntro);
-      document.querySelector('#nav-start').addEventListener('click', startGame);
-    } else if (bind) {
-      document.querySelector('#nav-about').bind('click', openAbout);
-      document.querySelector('#close-about').bind('click', closeAbout);
-      document.querySelector('#nav-intro').bind('click', openIntro);
-      document.querySelector('#close-intro').bind('click', closeIntro);
-      document.querySelector('#nav-start').bind('click', startGame);
-    }
+    listen(document.querySelector('#nav-about'), 'click', openAbout);
+    listen(document.querySelector('#close-about'), 'click', closeAbout);
+    listen(document.querySelector('#nav-intro'), 'click', openIntro);
+    listen(document.querySelector('#close-intro'), 'click', closeIntro);
+    listen(document.querySelector('#nav-start'), 'click', startGame);
   };
   </script>
 </html>
