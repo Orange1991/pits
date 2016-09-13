@@ -73,11 +73,13 @@ html, body {
   height: 50%;
   background-color: #300;
 }
+.smooth {
+  transition: all .2s ease-in-out;
+}
 .pit {
   background-color: #09f;
   position: absolute;
   top: -2px;
-  transition: all .2s ease-in-out;
 }
 #pit-one {
   width: 20%;
@@ -87,7 +89,7 @@ html, body {
 .filling {
   background-color: #300;
   position: absolute;
-  transition: all .2s ease-in-out;
+  z-index: 3;
 }
 #filling-one.hide {
   opacity: 0;
@@ -112,8 +114,11 @@ html, body {
   font-size: 110%;
   color: #ff0;
 }
-#nav-container.hide {
+#nav-container.transparent {
   opacity: 0;
+}
+#nav-container.hide {
+  display: none;  
 }
 #nav-container:after {
   content: '';
@@ -248,6 +253,9 @@ html, body {
   transition: opacity .2s ease-out;
 }
 #logo.hide {
+  display: none;
+}
+#logo.transparent {
   opacity: 0;
 }
 #player {
