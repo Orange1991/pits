@@ -60,8 +60,19 @@
     </div>
   </body>
   <script type="text/javascript">
+  var eventsMap = {
+    'click': 'click',
+    'mousedown': 'touchstart',
+    'mouseup': 'touchend'
+  };
   var listen = function (obj, e, trigger) {
-    addEventListener && obj.addEventListener(e, trigger);
+    if (obj) {
+      if (obj.addEventListener) {
+        obj.addEventListener(e, trigger);
+      } else {
+        obj.bind(eventsMap[e] || e, trigger);
+      }
+    }
   };
   var addClass = function (obj, c) {
     if (!obj || !c) {
