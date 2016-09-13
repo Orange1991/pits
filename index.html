@@ -162,6 +162,7 @@
     var nextPit = pitTwo;
     var nextFilling = fillingTwo;
     var canEnlarge = false;
+    var enlarging = false;
     var scoreCount = 0;
     document.body.className = screenWidth >= screenHeight ? 'horizontal' : 'vertical';
     var enlargeInterval;
@@ -212,6 +213,7 @@
       if (canEnlarge) {
         enlargeInterval && clearInterval(enlargeInterval);
         canEnlarge = false;
+        enlarging = true;
         enlargeInterval = setInterval(function () {
           currentFillingEdge < maxFillingEdge && (currentFillingEdge += 1);
           renderCenterRect(currentFilling, currentFillingEdge, screenWidth);
@@ -219,19 +221,22 @@
       }
     };
     var stopEnlargementAndStartFallDown = function (e) {
-      enlargeInterval && clearInterval(enlargeInterval);
-      enlargeInterval = null;
-      addClass(currentFilling, SMOOTH_CLASS);
-      var fillingTop = screenHeight * 0.5 - currentFillingEdge;
-      var canFill = canFillIn(currentFillingEdge, currentPitEdge);
-      if (canFill) {
-        fillingTop += currentPitEdge;
+      if (enlarging) {
+        enlarging = false;
+        enlargeInterval && clearInterval(enlargeInterval);
+        enlargeInterval = null;
+        addClass(currentFilling, SMOOTH_CLASS);
+        var fillingTop = screenHeight * 0.5 - currentFillingEdge;
+        var canFill = canFillIn(currentFillingEdge, currentPitEdge);
+        if (canFill) {
+          fillingTop += currentPitEdge;
+        }
+        renderTop(currentFilling, fillingTop);
+        setTimeout(function () {
+          removeClass(currentFilling, SMOOTH_CLASS);
+          moveForward(canFill);
+        }, ANIM_DURATION);
       }
-      renderTop(currentFilling, fillingTop);
-      setTimeout(function () {
-        removeClass(currentFilling, SMOOTH_CLASS);
-        moveForward(canFill);
-      }, ANIM_DURATION);
       e.preventDefault();
     };
     var moveForward = function (canFillIn) {
