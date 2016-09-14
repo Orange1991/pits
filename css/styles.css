@@ -59,6 +59,7 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 #sky-container {
   position: relative;
@@ -268,7 +269,7 @@ html, body {
   top: 20px;
 }
 #score {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: bold;
   height: 37px;
   line-height: 37px;
@@ -276,5 +277,5 @@ html, body {
   margin-left: 10px;
 }
 #score.emphasized {
-  font-size: 130%;
+  font-size: 200%;
 }
