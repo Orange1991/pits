@@ -50,8 +50,8 @@
               <div id="result-score"></div>
               <div id="result-msg"></div>
               <div class="result-buttons">
-                <input class="result-button" id="replay" type="button" value="Reply"/>
-                <input class="result-button" id="home" type="button" value="Home"/>
+                <span class="result-button" id="replay" type="button">Replay</span>
+                <span class="result-button" id="home" type="button">Home</span>
               </div>
             </div>
           </div>
@@ -157,6 +157,9 @@
   var renderHeight = function (obj, height) {
     obj && (obj.style.height = height + 'px');
   };
+  var renderWidth = function (obj, width) {
+    obj && (obj.style.width = width + 'px');
+  };
   var init = function () {
     var screenWidth = document.body.clientWidth;
     var screenHeight = document.body.clientHeight;
@@ -224,8 +227,6 @@
         addClass(logo, HIDE_CLASS);
         addClass(navContainer, HIDE_CLASS);
       }, ANIM_DURATION);
-      listen(mainContainer, 'mousedown', startEnlargement);
-      listen(mainContainer, 'mouseup', stopEnlargementAndStartFallDown);
     };
     var initGame = function () {
       canEnlarge = false;
@@ -423,6 +424,8 @@
         removeClass(logo, TRANSPARENT_CLASS);
         removeClass(navContainer, TRANSPARENT_CLASS);
         renderHeight(currentPit, screenHeight * 0.1);
+        renderWidth(currentPit, screenWidth * 0.2);
+        renderLeft(currentPit, screenWidth * 0.4)
         initPlayer();
       }, ANIM_DURATION);
     };
@@ -444,7 +447,8 @@
     listen(document.querySelector('#nav-start'), 'click', startGame);
     listen(document.querySelector('#replay'), 'click', replay);
     listen(document.querySelector('#home'), 'click', goHome);
-    
+    listen(mainContainer, 'mousedown', startEnlargement);
+    listen(mainContainer, 'mouseup', stopEnlargementAndStartFallDown);
   };
   </script>
 </html>

@@ -346,9 +346,12 @@ html, body {
 .result-button {
   width: 60px;
   border: none;
-  user-select: none;
   color: #fff;
   height: 30px;
+  line-height: 30px;
+  text-align: center;
+  display: inline-block;
+  font-size: 14px;
 }
 #replay {
   background-color: #396;
