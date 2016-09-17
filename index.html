@@ -7,10 +7,10 @@
     <link rel="stylesheet" type="text/css" href="css/pits.min.css" />
     <script type="text/javascript" src="js/pits.min.js"></script>
   </head>
-  <body onload="init()">
+  <body onload="init()" onresize="resizeWin()">
     <div id="main-container">
       <div id="sky-container">
-        <div id="logo">
+        <div id="logo" class="smooth">
           <img src="img/pits.png" />
         </div>
         <div id="score-container" class="hide smooth transparent">
@@ -40,7 +40,7 @@
           <div class="nav-zh">关于</div>
         </div>
       </div>
-      <div id="result-container" class="hide transparent">
+      <div id="result-container" class="hide transparent smooth">
         <div class="result-inner">
           <div class="result-inner-cell">
             <div class="result-wrapper">
@@ -50,14 +50,14 @@
               <div id="result-score"></div>
               <div id="result-msg"></div>
               <div class="result-buttons">
-                <span class="result-button" id="replay" type="button">Replay</span>
-                <span class="result-button" id="home" type="button">Home</span>
+                <span class="result-button smooth" id="replay">Replay</span>
+                <span class="result-button smooth" id="home">Home</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div id="intro-container" class="hover-container">
+      <div id="intro-container" class="hover-container smooth">
         <div class="close-button" id="close-intro">&times;</div>
         <div class="intro-scroll">
           <div class="intro-pics-container">
@@ -69,7 +69,7 @@
           </div>
         </div>
       </div>
-      <div id="about-container" class="hover-container">
+      <div id="about-container" class="hover-container smooth">
         <div class="close-button" id="close-about">&times;</div>
         <div id="about-inner">
           <div id="about-info">

@@ -1,52 +1,64 @@
 /** @Copyright sfg1991@163.com */
-var eventsMap = {
-  'mousedown': 'touchstart',
-  'mouseup': 'touchend'
-};
 var listen = function (obj, e, trigger) {
   if (obj) {
     if (obj.addEventListener) {
       obj.addEventListener(e, trigger);
-      if (eventsMap[e]) {
-        obj.addEventListener(eventsMap[e], trigger);
-      }
+    } else if (obj.bind) {
+      obj.bind(e, trigger);
     }
   }
 };
-var addClass = function (obj, c) {
-  if (!obj || !c) {
+var resizeWinTimeout = null;
+var resizeWin = function () {
+  resizeWinTimeout && clearTimeout(resizeWinTimeout);
+  resizeWinTimeout = setTimeout(function () {
+    var curUrl = location.href;
+    var index = curUrl.indexOf('?')
+    if (index > -1) {
+      curUrl = curUrl.substring(0, index)
+    }
+    location.href = curUrl + '?d=' + (new Date().getTime());
+  }, 500);
+};
+var addClass = function (obj, arr) {
+  if (!obj || !arr || !arr.length) {
     return;
   }
   var currentClass = obj.className;
   if (!currentClass) {
-    obj.className = c;
+    obj.className = arr.join(' ');
   } else {
     var currentArr = currentClass.split(' ').filter(function (s) {
       return !!s;
     });
-    if (currentArr.indexOf(c) == -1) {
-      currentArr.push(c);
-      obj.className = currentArr.join(' ');
-    }
+    var addedCount = 0;
+    arr.forEach(function (c) {
+      if (currentArr.indexOf(c) == -1) {
+        currentArr.push(c);
+        ++addedCount;
+      }
+    });
+    addedCount > 0 && (obj.className = currentArr.join(' '));
   }
 };
-var removeClass = function (obj, c) {
-  if (!obj || !obj.className || !c) {
+var removeClass = function (obj, arr) {
+  if (!obj || !obj.className || !arr || !arr.length) {
     return;
   }
   var currentClass = obj.className;
-  if (currentClass.indexOf(c) == -1) {
-    return;
-  } else {
-    var currentArr = currentClass.split(' ').filter(function (s) {
-      return !!s;
-    });
+
+  var currentArr = currentClass.split(' ').filter(function (s) {
+    return !!s;
+  });
+  var removedCount = 0;
+  arr.forEach(function (c) {
     var index = currentArr.indexOf(c);
     if (index != -1) {
       currentArr.splice(index, 1);
-      obj.className = currentArr.join(' ');
+      ++removedCount;
     }
-  }
+  });
+  removedCount > 0 && (obj.className = currentArr.join(' '));
 };
 var renderCenterRect = function (obj, edge, screenWidth) {
   if (!obj) {
@@ -77,6 +89,19 @@ var renderHeight = function (obj, height) {
 };
 var renderWidth = function (obj, width) {
   obj && (obj.style.width = width + 'px');
+};
+var isMobile = function () {
+  var sUserAgent= navigator.userAgent.toLowerCase(),
+  isIpad= sUserAgent.match(/ipad/i) == "ipad",
+  isIphoneOs= sUserAgent.match(/iphone os/i) == "iphone os",
+  isMidp= sUserAgent.match(/midp/i) == "midp",
+  isUc7= sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4",
+  isUc= sUserAgent.match(/ucweb/i) == "ucweb",
+  isAndroid= sUserAgent.match(/android/i) == "android",
+  isCE= sUserAgent.match(/windows ce/i) == "windows ce",
+  isWM= sUserAgent.match(/windows mobile/i) == "windows mobile",
+  isWebview = sUserAgent.match(/webview/i) == "webview";
+  return (isIpad || isIphoneOs || isMidp || isUc7 || isUc || isAndroid || isCE || isWM);
 };
 var init = function () {
   var screenWidth = document.body.clientWidth;
@@ -124,8 +149,10 @@ var init = function () {
     BLOCK: 3
   };
   var MSGS = ['太远了，过不去', '摔死啦', '撞墙啦'];
-  var WALK_THROUGH_MAX_WIDTH_THRESHOLD = 5;
-  var WALK_THROUGH_MAX_HEIGHT_THRESHOLD = 10;
+  var WALK_THROUGH_MAX_WIDTH_MIN_THRESHOLD = 5;
+  var WALK_THROUGH_MAX_WIDTH_MAX_THRESHOLD = 15;
+  var WALK_THROUGH_MAX_HEIGHT_MIN_THRESHOLD = 10;
+  var WALK_THROUGH_MAX_HEIGHT_MAX_THRESHOLD = 30;
   var WALK_THROUGH_MAX_WIDTH = 5;
   var WALK_THROUGH_MAX_HEIGHT = 10;
   var HIDE_CLASS = 'hide';
@@ -133,17 +160,28 @@ var init = function () {
   var SMOOTH_CLASS = 'smooth';
   var EMPHASIZED_CLASS = 'emphasized';
 
-  var openAbout = function () { addClass(document.querySelector('#about-container'), 'show'); };
-  var closeAbout = function () { removeClass(document.querySelector('#about-container'), 'show'); };
-  var openIntro = function () { addClass(document.querySelector('#intro-container'), 'show'); };
-  var closeIntro = function () { removeClass(document.querySelector('#intro-container'), 'show'); };
+  var touchStart, touchMove, touchEnd;
+  if (isMobile()) {
+    touchStart = 'touchstart';
+    touchMove = 'touchmove';
+    touchEnd = 'touchend';
+  } else {
+    touchStart = 'mousedown';
+    touchMove = 'mousemove';
+    touchEnd = 'mouseup';
+  }
+
+  var openAbout = function () { addClass(document.querySelector('#about-container'), ['show']); };
+  var closeAbout = function () { removeClass(document.querySelector('#about-container'), ['show']); };
+  var openIntro = function () { addClass(document.querySelector('#intro-container'), ['show']); };
+  var closeIntro = function () { removeClass(document.querySelector('#intro-container'), ['show']); };
   var startGame = function () {
     initGame();
-    addClass(logo, TRANSPARENT_CLASS);
-    addClass(navContainer, TRANSPARENT_CLASS);
+    addClass(logo, [TRANSPARENT_CLASS]);
+    addClass(navContainer, [TRANSPARENT_CLASS]);
     setTimeout(function () {
-      addClass(logo, HIDE_CLASS);
-      addClass(navContainer, HIDE_CLASS);
+      addClass(logo, [HIDE_CLASS]);
+      addClass(navContainer, [HIDE_CLASS]);
     }, ANIM_DURATION);
   };
   var initGame = function () {
@@ -154,15 +192,14 @@ var init = function () {
 
     initPlayer();
     score.innerHTML = scoreCount;
-    removeClass(scoreContainer, HIDE_CLASS);
-    removeClass(scoreContainer, TRANSPARENT_CLASS);
-    removeClass(currentFilling, HIDE_CLASS);
+    removeClass(scoreContainer, [HIDE_CLASS, TRANSPARENT_CLASS]);
+    removeClass(currentFilling, [HIDE_CLASS]);
     renderTop(currentFilling, 20);
     renderCenterRect(currentFilling, currentFillingEdge, screenWidth);
     renderCenterRect(currentPit, currentPitEdge, screenWidth);
     setWalkMaxVal();
     setTimeout(function () {
-      removeClass(currentFilling, SMOOTH_CLASS);
+      removeClass(currentFilling, [SMOOTH_CLASS]);
       canEnlarge = true;
     }, ANIM_DURATION);
   };
@@ -180,10 +217,11 @@ var init = function () {
   var stopEnlargementAndStartFallDown = function (e) {
     if (enlarging && enlargeInterval) {
       e.preventDefault();
+      e.returnValue = false;
       enlarging = false;
       clearInterval(enlargeInterval);
       enlargeInterval = null;
-      addClass(currentFilling, SMOOTH_CLASS);
+      addClass(currentFilling, [SMOOTH_CLASS]);
       var fillingTop = screenHeight * 0.5 - currentFillingEdge;
       var canFill = canFillIn(currentFillingEdge, currentPitEdge);
       if (canFill) {
@@ -191,7 +229,7 @@ var init = function () {
       }
       renderTop(currentFilling, fillingTop);
       setTimeout(function () {
-        removeClass(currentFilling, SMOOTH_CLASS);
+        removeClass(currentFilling, [SMOOTH_CLASS]);
         moveForward(canFill);
       }, ANIM_DURATION);
     }
@@ -202,16 +240,16 @@ var init = function () {
         case WALK_THROUGH_RESULT.THROUGH:
           renderLeft(player, screenWidth * 0.75 - player.clientWidth / 2);
           setTimeout(function () {
-            addClass(award, SMOOTH_CLASS);
+            addClass(award, [SMOOTH_CLASS]);
             renderRight(award, 20 + score.clientWidth);
             renderTop(award, 20 - screenHeight / 2);
             setTimeout(function () {
-              removeClass(award, SMOOTH_CLASS);
-              addClass(award, HIDE_CLASS);
-              addClass(score, EMPHASIZED_CLASS);
+              removeClass(award, [SMOOTH_CLASS]);
+              addClass(award, [HIDE_CLASS]);
+              addClass(score, [EMPHASIZED_CLASS]);
               score.innerHTML = ++scoreCount;
               setTimeout(function () {
-                removeClass(score, EMPHASIZED_CLASS);
+                removeClass(score, [EMPHASIZED_CLASS]);
               }, ANIM_DURATION);
               mapForward();
             }, ANIM_DURATION);
@@ -247,10 +285,9 @@ var init = function () {
     enableEnlargement();
   };
   var initOverflowElements = function () {
-    removeClass(nextFilling, SMOOTH_CLASS);
-    removeClass(nextPit, SMOOTH_CLASS);
-    removeClass(award, SMOOTH_CLASS);
-    removeClass(award, HIDE_CLASS);
+    removeClass(nextFilling, [SMOOTH_CLASS]);
+    removeClass(nextPit, [SMOOTH_CLASS]);
+    removeClass(award, [SMOOTH_CLASS, HIDE_CLASS]);
     currentFillingEdge = minFillingEdge;
     currentPitEdge = calRandomPitEdge(minPitEdge, maxPitEdge);
     setWalkMaxVal();
@@ -268,15 +305,15 @@ var init = function () {
     renderLeft(player, screenWidth * 0.2);
   };
   var moveOverflowElements = function () {
-    addClass(nextFilling, SMOOTH_CLASS);
-    addClass(nextPit, SMOOTH_CLASS);
-    addClass(award, SMOOTH_CLASS);
+    addClass(nextFilling, [SMOOTH_CLASS]);
+    addClass(nextPit, [SMOOTH_CLASS]);
+    addClass(award, [SMOOTH_CLASS]);
     renderLeft(nextFilling, (screenWidth - currentFillingEdge) / 2);
     renderLeft(nextPit, (screenWidth - currentPitEdge) / 2);
     renderRight(award, screenWidth * 0.2);
     setTimeout(function () {
-      removeClass(currentFilling  , SMOOTH_CLASS);
-      removeClass(nextFilling, SMOOTH_CLASS);
+      removeClass(currentFilling  , [SMOOTH_CLASS]);
+      removeClass(nextFilling, [SMOOTH_CLASS]);
     }, ANIM_DURATION);
   };
   var exchangeElementsRole = function () {
@@ -318,29 +355,26 @@ var init = function () {
     }
     resultScore.innerHTML = scoreCount;
     resultMsg.innerHTML = msg;
-    removeClass(resultContainer, HIDE_CLASS);
-    addClass(resultContainer, SMOOTH_CLASS);
-    removeClass(resultContainer, TRANSPARENT_CLASS);
+    addClass(resultContainer, [SMOOTH_CLASS]);
+    removeClass(resultContainer, [HIDE_CLASS, TRANSPARENT_CLASS]);
   };
   var replay = function () {
-    addClass(resultContainer, TRANSPARENT_CLASS)
+    addClass(resultContainer, [TRANSPARENT_CLASS])
     setTimeout(function () {
-      addClass(resultContainer, HIDE_CLASS);
+      addClass(resultContainer, [HIDE_CLASS]);
     }, ANIM_DURATION);
     initGame();
   };
   var goHome = function () {
-    addClass(currentFilling, TRANSPARENT_CLASS);
-    addClass(resultContainer, TRANSPARENT_CLASS);
-    addClass(scoreContainer, TRANSPARENT_CLASS);
+    addClass(currentFilling, [TRANSPARENT_CLASS]);
+    addClass(resultContainer, [TRANSPARENT_CLASS]);
+    addClass(scoreContainer, [TRANSPARENT_CLASS]);
     setTimeout(function () {
-      addClass(currentFilling, HIDE_CLASS);
-      addClass(resultContainer, HIDE_CLASS);
-      addClass(scoreContainer, HIDE_CLASS);
-      removeClass(logo, HIDE_CLASS);
-      removeClass(navContainer, HIDE_CLASS);
-      removeClass(logo, TRANSPARENT_CLASS);
-      removeClass(navContainer, TRANSPARENT_CLASS);
+      addClass(currentFilling, [HIDE_CLASS]);
+      addClass(resultContainer, [HIDE_CLASS]);
+      addClass(scoreContainer, [HIDE_CLASS]);
+      removeClass(logo, [HIDE_CLASS, TRANSPARENT_CLASS]);
+      removeClass(navContainer, [HIDE_CLASS, TRANSPARENT_CLASS]);
       renderHeight(currentPit, screenHeight * 0.1);
       renderWidth(currentPit, screenWidth * 0.2);
       renderLeft(currentPit, screenWidth * 0.4)
@@ -353,9 +387,17 @@ var init = function () {
   };
   var setWalkMaxVal = function () {
     WALK_THROUGH_MAX_WIDTH = currentPitEdge * 0.2;
-    WALK_THROUGH_MAX_WIDTH < WALK_THROUGH_MAX_WIDTH_THRESHOLD && (WALK_THROUGH_MAX_WIDTH = WALK_THROUGH_MAX_WIDTH_THRESHOLD);
+    if (WALK_THROUGH_MAX_WIDTH < WALK_THROUGH_MAX_WIDTH_MIN_THRESHOLD) {
+      WALK_THROUGH_MAX_WIDTH = WALK_THROUGH_MAX_WIDTH_MIN_THRESHOLD;
+    } else if (WALK_THROUGH_MAX_WIDTH > WALK_THROUGH_MAX_WIDTH_MAX_THRESHOLD) {
+      WALK_THROUGH_MAX_WIDTH = WALK_THROUGH_MAX_WIDTH_MAX_THRESHOLD;
+    }
     WALK_THROUGH_MAX_HEIGHT = currentPitEdge * 0.3;
-    WALK_THROUGH_MAX_HEIGHT < WALK_THROUGH_MAX_HEIGHT_THRESHOLD && (WALK_THROUGH_MAX_HEIGHT = WALK_THROUGH_MAX_HEIGHT_THRESHOLD);
+    if (WALK_THROUGH_MAX_HEIGHT < WALK_THROUGH_MAX_HEIGHT_MIN_THRESHOLD) {
+      WALK_THROUGH_MAX_HEIGHT = WALK_THROUGH_MAX_HEIGHT_MIN_THRESHOLD;
+    } else if (WALK_THROUGH_MAX_HEIGHT > WALK_THROUGH_MAX_HEIGHT_MAX_THRESHOLD) {
+      WALK_THROUGH_MAX_HEIGHT = WALK_THROUGH_MAX_HEIGHT_MAX_THRESHOLD;
+    }
   };
 
   listen(document.querySelector('#nav-about'), 'click', openAbout);
@@ -365,6 +407,6 @@ var init = function () {
   listen(document.querySelector('#nav-start'), 'click', startGame);
   listen(document.querySelector('#replay'), 'click', replay);
   listen(document.querySelector('#home'), 'click', goHome);
-  listen(mainContainer, 'mousedown', startEnlargement);
-  listen(mainContainer, 'mouseup', stopEnlargementAndStartFallDown);
+  listen(mainContainer, touchStart, startEnlargement);
+  listen(mainContainer, touchEnd, stopEnlargementAndStartFallDown);
 };

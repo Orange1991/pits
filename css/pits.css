@@ -76,7 +76,10 @@ html, body {
   background-color: #300;
 }
 .smooth {
-  transition: all .2s ease-in-out;
+  -webkit-transition: all .2s ease-in-out;
+     -moz-transition: all .2s ease-in-out;
+      -ms-transition: all .2s ease-in-out;
+          transition: all .2s ease-in-out;
 }
 .pit {
   background-color: #09f;
@@ -98,7 +101,6 @@ html, body {
   left: 5%;
   top: 70%;
   width: 90%;
-  transition: opacity .2s ease-out;
 }
 #nav-container .nav-block {
   width: 30%;
@@ -153,7 +155,6 @@ html, body {
   top: 100%;
   background-color: #000;
   color: #cacbcf;
-  transition: top 0.2s ease-in-out;
 }
 .hover-container.show {
   top: 0;
@@ -250,7 +251,6 @@ html, body {
   width: 100%;
   top: 30%;
   text-align: center;
-  transition: opacity .2s ease-out;
 }
 .hide {
   display: none;
@@ -354,9 +354,13 @@ html, body {
   display: inline-block;
   font-size: 14px;
 }
+.result-button:hover,
+.result-button:active,
+.result-button:focus {
+  cursor: pointer;
+}
 #replay {
   background-color: #396;
-  transition: background-color .2s ease-in-out;
 }
 #replay:focus,
 #replay:active,
@@ -365,7 +369,6 @@ html, body {
 }
 #home {
   background-color: #36f;
-  transition: background-color .2s ease-in-out;
 }
 #home:focus,
 #home:active,
