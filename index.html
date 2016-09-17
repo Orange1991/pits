@@ -40,6 +40,23 @@
           <div class="nav-zh">关于</div>
         </div>
       </div>
+      <div id="result-container" class="hide transparent">
+        <div class="result-inner">
+          <div class="result-inner-cell">
+            <div class="result-wrapper">
+              <div class="result-icon">
+                <img src="img/bone.png" id="result-icon-img" />
+              </div>
+              <div id="result-score"></div>
+              <div id="result-msg"></div>
+              <div class="result-buttons">
+                <input class="result-button" id="replay" type="button" value="Reply"/>
+                <input class="result-button" id="home" type="button" value="Home"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div id="intro-container" class="hover-container">
         <div class="close-button" id="close-intro">&times;</div>
         <div class="intro-scroll">
@@ -137,6 +154,9 @@
   var renderTop = function (obj, top) {
     obj && (obj.style.top = top + 'px');
   };
+  var renderHeight = function (obj, height) {
+    obj && (obj.style.height = height + 'px');
+  };
   var init = function () {
     var screenWidth = document.body.clientWidth;
     var screenHeight = document.body.clientHeight;
@@ -148,6 +168,9 @@
     var minFillingEdge = minPitEdge / 2;
     var maxFillingEdge = maxPitEdge * 2;
     var currentFillingEdge = minFillingEdge;
+
+    document.body.className = screenWidth >= screenHeight ? 'horizontal' : 'vertical';
+
     var mainContainer = document.querySelector('#main-container');
     var pitOne = document.querySelector('#pit-one');
     var pitTwo = document.querySelector('#pit-two');
@@ -157,15 +180,21 @@
     var award = document.querySelector('#award');
     var score = document.querySelector('#score');
     var scoreContainer = document.querySelector('#score-container');
+    var resultContainer = document.querySelector('#result-container');
+    var resultScore = document.querySelector('#result-score');
+    var resultMsg = document.querySelector('#result-msg');
+    var logo = document.querySelector('#logo');
+    var navContainer = document.querySelector('#nav-container');
     var currentPit = pitOne;
     var currentFilling = fillingOne;
     var nextPit = pitTwo;
     var nextFilling = fillingTwo;
+
     var canEnlarge = false;
     var enlarging = false;
     var scoreCount = 0;
-    document.body.className = screenWidth >= screenHeight ? 'horizontal' : 'vertical';
     var enlargeInterval;
+
     var ANIM_DURATION = 200;
     var WALK_THROUGH_RESULT= {
       THROUGH: 0,
@@ -173,8 +202,11 @@
       TOO_HIGH: 2,
       BLOCK: 3
     };
-    var WALK_THROUGH_MAX_WIDTH = maxPitEdge / 4;
-    var WALK_THROUGH_MAX_HEIGHT = maxPitEdge / 3;
+    var MSGS = ['太远了，过不去', '摔死啦', '撞墙啦'];
+    var WALK_THROUGH_MAX_WIDTH_THRESHOLD = 5;
+    var WALK_THROUGH_MAX_HEIGHT_THRESHOLD = 10;
+    var WALK_THROUGH_MAX_WIDTH = 5;
+    var WALK_THROUGH_MAX_HEIGHT = 10;
     var HIDE_CLASS = 'hide';
     var TRANSPARENT_CLASS = 'transparent';
     var SMOOTH_CLASS = 'smooth';
@@ -186,34 +218,40 @@
     var closeIntro = function () { removeClass(document.querySelector('#intro-container'), 'show'); };
     var startGame = function () {
       initGame();
-    };
-    var initGame = function () {
-      canEnlarge = false;
-      scoreCount = 0;
-      addClass(document.querySelector('#logo'), TRANSPARENT_CLASS);
-      addClass(document.querySelector('#nav-container'), TRANSPARENT_CLASS);
+      addClass(logo, TRANSPARENT_CLASS);
+      addClass(navContainer, TRANSPARENT_CLASS);
       setTimeout(function () {
-        addClass(document.querySelector('#logo'), HIDE_CLASS);
-        addClass(document.querySelector('#nav-container'), HIDE_CLASS);
-      }, ANIM_DURATION);
-      renderCenterRect(pitOne, currentPitEdge, screenWidth);
-      removeClass(scoreContainer, HIDE_CLASS);
-      removeClass(scoreContainer, TRANSPARENT_CLASS);
-      removeClass(fillingOne, HIDE_CLASS);
-      renderTop(fillingOne, 20);
-      renderCenterRect(fillingOne, currentFillingEdge, screenWidth);
-      setTimeout(function () {
-        removeClass(fillingOne, SMOOTH_CLASS);
-        canEnlarge = true;
+        addClass(logo, HIDE_CLASS);
+        addClass(navContainer, HIDE_CLASS);
       }, ANIM_DURATION);
       listen(mainContainer, 'mousedown', startEnlargement);
       listen(mainContainer, 'mouseup', stopEnlargementAndStartFallDown);
     };
+    var initGame = function () {
+      canEnlarge = false;
+      scoreCount = 0;
+      currentFillingEdge = minFillingEdge;
+      enlargeInterval && clearInterval(enlargeInterval);
+
+      initPlayer();
+      score.innerHTML = scoreCount;
+      removeClass(scoreContainer, HIDE_CLASS);
+      removeClass(scoreContainer, TRANSPARENT_CLASS);
+      removeClass(currentFilling, HIDE_CLASS);
+      renderTop(currentFilling, 20);
+      renderCenterRect(currentFilling, currentFillingEdge, screenWidth);
+      renderCenterRect(currentPit, currentPitEdge, screenWidth);
+      setWalkMaxVal();
+      setTimeout(function () {
+        removeClass(currentFilling, SMOOTH_CLASS);
+        canEnlarge = true;
+      }, ANIM_DURATION);
+    };
     var startEnlargement = function () {
       if (canEnlarge) {
-        enlargeInterval && clearInterval(enlargeInterval);
         canEnlarge = false;
         enlarging = true;
+        enlargeInterval && clearInterval(enlargeInterval);
         enlargeInterval = setInterval(function () {
           currentFillingEdge < maxFillingEdge && (currentFillingEdge += 1);
           renderCenterRect(currentFilling, currentFillingEdge, screenWidth);
@@ -221,9 +259,10 @@
       }
     };
     var stopEnlargementAndStartFallDown = function (e) {
-      if (enlarging) {
+      if (enlarging && enlargeInterval) {
+        e.preventDefault();
         enlarging = false;
-        enlargeInterval && clearInterval(enlargeInterval);
+        clearInterval(enlargeInterval);
         enlargeInterval = null;
         addClass(currentFilling, SMOOTH_CLASS);
         var fillingTop = screenHeight * 0.5 - currentFillingEdge;
@@ -237,7 +276,6 @@
           moveForward(canFill);
         }, ANIM_DURATION);
       }
-      e.preventDefault();
     };
     var moveForward = function (canFillIn) {
       if (canFillIn) {
@@ -296,6 +334,7 @@
       removeClass(award, HIDE_CLASS);
       currentFillingEdge = minFillingEdge;
       currentPitEdge = calRandomPitEdge(minPitEdge, maxPitEdge);
+      setWalkMaxVal();
       renderRect(nextFilling, currentFillingEdge);
       renderRect(nextPit, currentPitEdge);
       renderTop(nextFilling, 20);
@@ -353,26 +392,59 @@
       return edge > maxVal ? maxVal : edge < minVal ? minVal : edge;
     };
     var showScore = function (type) {
-      switch (type) {
-        case WALK_THROUGH_RESULT.TOO_HIGH:
-          alert('摔死啦，得分：' + scoreCount + '，刷新界面重新开始');
-          break;
-        case WALK_THROUGH_RESULT.TOO_WIDE:
-          alert('太远了，过不去，得分；' + scoreCount + '，刷新界面重新开始');
-          break;
-        case WALK_THROUGH_RESULT.BLOCK:
-          alert('撞墙啦，得分：' + scoreCount + '，刷新界面重新开始');
-          break;
-        default:
-          alert('得分：' + scoreCount + '，刷新界面重新开始');
-          break;
+      type = parseInt(type);
+      var msg = '失败啦';
+      if (type >= 1 && type <= 3) {
+        msg = MSGS[type - 1];
       }
-  };
+      resultScore.innerHTML = scoreCount;
+      resultMsg.innerHTML = msg;
+      removeClass(resultContainer, HIDE_CLASS);
+      addClass(resultContainer, SMOOTH_CLASS);
+      removeClass(resultContainer, TRANSPARENT_CLASS);
+    };
+    var replay = function () {
+      addClass(resultContainer, TRANSPARENT_CLASS)
+      setTimeout(function () {
+        addClass(resultContainer, HIDE_CLASS);
+      }, ANIM_DURATION);
+      initGame();
+    };
+    var goHome = function () {
+      addClass(currentFilling, TRANSPARENT_CLASS);
+      addClass(resultContainer, TRANSPARENT_CLASS);
+      addClass(scoreContainer, TRANSPARENT_CLASS);
+      setTimeout(function () {
+        addClass(currentFilling, HIDE_CLASS);
+        addClass(resultContainer, HIDE_CLASS);
+        addClass(scoreContainer, HIDE_CLASS);
+        removeClass(logo, HIDE_CLASS);
+        removeClass(navContainer, HIDE_CLASS);
+        removeClass(logo, TRANSPARENT_CLASS);
+        removeClass(navContainer, TRANSPARENT_CLASS);
+        renderHeight(currentPit, screenHeight * 0.1);
+        initPlayer();
+      }, ANIM_DURATION);
+    };
+    var initPlayer = function () {
+      renderLeft(player, screenWidth * 0.2);
+      renderTop(player, -player.clientHeight);
+    };
+    var setWalkMaxVal = function () {
+      WALK_THROUGH_MAX_WIDTH = currentPitEdge * 0.2;
+      WALK_THROUGH_MAX_WIDTH < WALK_THROUGH_MAX_WIDTH_THRESHOLD && (WALK_THROUGH_MAX_WIDTH = WALK_THROUGH_MAX_WIDTH_THRESHOLD);
+      WALK_THROUGH_MAX_HEIGHT = currentPitEdge * 0.3;
+      WALK_THROUGH_MAX_HEIGHT < WALK_THROUGH_MAX_HEIGHT_THRESHOLD && (WALK_THROUGH_MAX_HEIGHT = WALK_THROUGH_MAX_HEIGHT_THRESHOLD);
+    };
+
     listen(document.querySelector('#nav-about'), 'click', openAbout);
     listen(document.querySelector('#close-about'), 'click', closeAbout);
     listen(document.querySelector('#nav-intro'), 'click', openIntro);
     listen(document.querySelector('#close-intro'), 'click', closeIntro);
     listen(document.querySelector('#nav-start'), 'click', startGame);
+    listen(document.querySelector('#replay'), 'click', replay);
+    listen(document.querySelector('#home'), 'click', goHome);
+    
   };
   </script>
 </html>
