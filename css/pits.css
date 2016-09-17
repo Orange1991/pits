@@ -1,3 +1,4 @@
+/** @Copyright sfg1991@163.com */
 /** reset css */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -59,6 +60,7 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 #sky-container {
   position: relative;
@@ -67,14 +69,17 @@ html, body {
   background-color: #09f;
 }
 #earth-container {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 100%;
   height: 50%;
   background-color: #300;
 }
 .smooth {
-  transition: all .2s ease-in-out;
+  -webkit-transition: all .2s ease-in-out;
+     -moz-transition: all .2s ease-in-out;
+      -ms-transition: all .2s ease-in-out;
+          transition: all .2s ease-in-out;
 }
 .pit {
   background-color: #09f;
@@ -91,15 +96,11 @@ html, body {
   position: absolute;
   z-index: 3;
 }
-#filling-one.hide {
-  opacity: 0;
-}
 #nav-container {
   position: absolute;
   left: 5%;
   top: 70%;
   width: 90%;
-  transition: opacity .2s ease-out;
 }
 #nav-container .nav-block {
   width: 30%;
@@ -116,9 +117,6 @@ html, body {
 }
 #nav-container.transparent {
   opacity: 0;
-}
-#nav-container.hide {
-  display: none;  
 }
 #nav-container:after {
   content: '';
@@ -157,13 +155,13 @@ html, body {
   top: 100%;
   background-color: #000;
   color: #cacbcf;
-  transition: top 0.2s ease-in-out;
 }
 .hover-container.show {
   top: 0;
 }
 #about-container {
   text-align: center;
+  z-index: 6;
 }
 #about-inner {
   width: 85%;
@@ -208,6 +206,9 @@ html, body {
   width: 100%;
   height: 100%;
 }
+#intro-container {
+  z-index: 6;
+}
 #intro-container .intro-scroll {
   width: 100%;
   height: 100%;
@@ -250,9 +251,8 @@ html, body {
   width: 100%;
   top: 30%;
   text-align: center;
-  transition: opacity .2s ease-out;
 }
-#logo.hide {
+.hide {
   display: none;
 }
 #logo.transparent {
@@ -262,9 +262,116 @@ html, body {
   position: absolute;
   top: -45px;
   left: 20%;
+  z-index: 4;
 }
 #award {
   position: absolute;
   top: -35px;
   right: 20%;
+  z-index: 4;
+}
+#score-container {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+#score {
+  font-size: 30px;
+  font-weight: bold;
+  height: 37px;
+  line-height: 37px;
+  float: right;
+  margin-left: 10px;
+}
+#score.emphasized {
+  font-size: 200%;
+}
+#result-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 5;
+}
+.result-inner {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.result-inner-cell {
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+  height: 100%;
+}
+.result-wrapper {
+  position: relative;
+  text-align: center;
+  width: 200px;
+  margin: auto;
+  padding: 45px 30px 30px 30px;
+  box-sizing: border-box;
+  background-color: #fff;
+  border: 3px solid #096;
+}
+.result-icon {
+  position: absolute;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  top: -32px;
+  left: 68px;
+  background-color: #fff;
+  border: 2px solid #300;
+}
+.result-icon img {
+  width: 30px;
+  height: 30px;
+  margin: 15px;
+}
+#result-score {
+  font-size: 40px;
+  font-weight: bold;
+  color: #30c;
+}
+#result-msg {
+  font-size: 16px;
+  margin-top: 10px;
+  color: #c00;
+}
+.result-buttons {
+  margin-top: 20px;
+}
+.result-button {
+  width: 60px;
+  border: none;
+  color: #fff;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  display: inline-block;
+  font-size: 14px;
+}
+.result-button:hover,
+.result-button:active,
+.result-button:focus {
+  cursor: pointer;
+}
+#replay {
+  background-color: #396;
+}
+#replay:focus,
+#replay:active,
+#replay:hover {
+  background-color: #366;
+}
+#home {
+  background-color: #36f;
+}
+#home:focus,
+#home:active,
+#home:hover {
+  background-color: #309;
 }
